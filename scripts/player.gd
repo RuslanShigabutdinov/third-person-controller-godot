@@ -15,6 +15,9 @@ var is_locked: bool = false
 
 @export var sens_horizontal: float = 0.2
 @export var sens_vertical: float = 0.2
+var camera_pitch: float = 0.0
+@export var min_pitch: float = -45.0
+@export var max_pitch: float = 60.0
 
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
@@ -22,8 +25,9 @@ func _ready() -> void:
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
 		rotate_y(deg_to_rad(event.relative.x * sens_horizontal * -1))
-		visuals.rotate_y(deg_to_rad(event.relative.y * sens_vertical))
-		camera_mount.rotate_x(deg_to_rad(event.relative.y * sens_vertical * -1))
+		camera_pitch -= event.relative.y * sens_vertical
+		camera_pitch = clamp(camera_pitch, min_pitch, max_pitch)
+		camera_mount.rotation_degrees.x = camera_pitch
 		
 func _physics_process(delta: float) -> void:
 	if !animation_player.is_playing():
